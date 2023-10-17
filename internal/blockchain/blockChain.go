@@ -1,22 +1,24 @@
 package blockchain
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 )
 
 type BlockChain struct {
-	chain               []Block
-	pendingTransactions []Transaction
-	wallets             map[string]int64
-	reward              int64
+	Chain               []Block          `json:"chain"`
+	PendingTransactions []Transaction    `json:"pendingTransactions"`
+	Wallets             map[string]int64 `json:"wallets"`
+	Reward              int64            `json:"reward"`
 }
 
 func NewBlockChain(wallets map[string]int64) BlockChain {
 	bc := BlockChain{
-		wallets:             wallets,
-		reward:              1,
-		pendingTransactions: make([]Transaction, 0),
+		Wallets:             wallets,
+		Reward:              1,
+		PendingTransactions: make([]Transaction, 0),
 	}
 	bc.CreateGenesisBlock()
 	return bc
@@ -25,39 +27,39 @@ func NewBlockChain(wallets map[string]int64) BlockChain {
 func (bc *BlockChain) CreateGenesisBlock() Block {
 	genesisBlock := NewGenesisBlock(time.Now())
 	genesisBlock.Mine()
-	bc.chain = append(bc.chain, genesisBlock)
-	return bc.chain[0]
+	bc.Chain = append(bc.Chain, genesisBlock)
+	return bc.Chain[0]
 }
 func (bc *BlockChain) getLatestBlock() Block {
-	return bc.chain[len(bc.chain)-1]
+	return bc.Chain[len(bc.Chain)-1]
 }
 
 func (bc *BlockChain) AddBlock(block Block) {
 	block.Mine()
-	bc.chain = append(bc.chain, block)
+	bc.Chain = append(bc.Chain, block)
 }
 func (bc *BlockChain) createTransaction(transaction Transaction) {
-	bc.pendingTransactions = append(bc.pendingTransactions, transaction)
+	bc.PendingTransactions = append(bc.PendingTransactions, transaction)
 }
 
 func (bc *BlockChain) ProcessPendingTransaction(mineAddress string) {
-	processed := bc.ProcessTransactions(bc.pendingTransactions)
+	processed := bc.ProcessTransactions(bc.PendingTransactions)
 	block := NewBlock(time.Now(), processed, bc.getLatestBlock())
 	bc.AddBlock(block)
-	bc.pendingTransactions = []Transaction{NewTransaction("", mineAddress, bc.reward)}
+	bc.PendingTransactions = []Transaction{NewTransaction("", mineAddress, bc.Reward)}
 }
 func (bc *BlockChain) GetBalance(address string) int64 {
-	return bc.wallets[address]
+	return bc.Wallets[address]
 }
 func (bc *BlockChain) ProcessTransactions(transaction []Transaction) []Transaction {
 	processedTransactions := make([]Transaction, 0)
 	for _, tx := range transaction {
-		if tx.fromAddress == "" {
-			bc.wallets[tx.toAddress] += tx.amount
+		if tx.FromAddress == "" {
+			bc.Wallets[tx.ToAddress] += tx.Amount
 			processedTransactions = append(processedTransactions, tx)
-		} else if isBalanceSufficient(bc.wallets[tx.fromAddress], tx.amount) {
-			bc.wallets[tx.fromAddress] -= tx.amount
-			bc.wallets[tx.toAddress] += tx.amount
+		} else if isBalanceSufficient(bc.Wallets[tx.FromAddress], tx.Amount) {
+			bc.Wallets[tx.FromAddress] -= tx.Amount
+			bc.Wallets[tx.ToAddress] += tx.Amount
 			processedTransactions = append(processedTransactions, tx)
 		} else {
 			log.Printf("balance is not sufficient for transaction: %s", tx.ToString())
@@ -69,22 +71,36 @@ func (bc *BlockChain) ProcessTransactions(transaction []Transaction) []Transacti
 func (bc *BlockChain) PerformTransaction(sender, receiver string, amount int64) string {
 	transaction := NewTransaction(sender, receiver, amount)
 	bc.createTransaction(transaction)
-	return transaction.id
+	return transaction.Id
 }
 func (bc *BlockChain) IsValid() bool {
-	for i := 1; i < len(bc.chain); i++ {
-		if bc.chain[i].IsValid() == false {
+	for i := 1; i < len(bc.Chain); i++ {
+		if bc.Chain[i].IsValid() == false {
 			return false
 		}
-		if bc.chain[i].prevHash != bc.chain[i-1].hash {
+		if bc.Chain[i].PrevHash != bc.Chain[i-1].Hash {
 			return false
 		}
 	}
 	return true
 }
-
+func (bc *BlockChain) Save() {
+	marshall, err := json.Marshal(&bc)
+	if err != nil {
+		log.Printf("error while marshalling block chain: %s", err.Error())
+	}
+	if err := Save(marshall, fmt.Sprintf("%s/%s.json", Dir, "block_chain")); err != nil {
+		log.Printf("error while saving block chain: %s", err.Error())
+	}
+}
+func (bc *BlockChain) Load() {
+	err := Load(bc, fmt.Sprintf("%s/%s.json", Dir, "block_chain"))
+	if err != nil {
+		log.Printf("error while loading block chain: %s", err.Error())
+	}
+}
 func (bc *BlockChain) CheckTransactionCompletion(id string) bool {
-	for _, block := range bc.chain {
+	for _, block := range bc.Chain {
 		if block.IsContainsTxByID(id) {
 			return true
 		}

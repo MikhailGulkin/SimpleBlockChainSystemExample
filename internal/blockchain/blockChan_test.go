@@ -6,8 +6,8 @@ import (
 
 func TestBlockChainCreate(t *testing.T) {
 	bc := NewBlockChain(map[string]int64{})
-	if len(bc.chain) != 1 {
-		t.Fatalf("expected 1, got: %d", len(bc.chain))
+	if len(bc.Chain) != 1 {
+		t.Fatalf("expected 1, got: %d", len(bc.Chain))
 	}
 }
 func TestBlockChainTransactionPending(t *testing.T) {
@@ -16,20 +16,20 @@ func TestBlockChainTransactionPending(t *testing.T) {
 		"bob":   100,
 	})
 	bc.PerformTransaction("alice", "bob", 10)
-	if len(bc.pendingTransactions) != 1 {
-		t.Fatalf("expected 1, got: %d", len(bc.pendingTransactions))
+	if len(bc.PendingTransactions) != 1 {
+		t.Fatalf("expected 1, got: %d", len(bc.PendingTransactions))
 	}
-	if bc.pendingTransactions[0].fromAddress != "alice" {
-		t.Fatalf("expected alice, got: %s", bc.pendingTransactions[0].fromAddress)
+	if bc.PendingTransactions[0].FromAddress != "alice" {
+		t.Fatalf("expected alice, got: %s", bc.PendingTransactions[0].FromAddress)
 	}
-	if bc.pendingTransactions[0].toAddress != "bob" {
-		t.Fatalf("expected bob, got: %s", bc.pendingTransactions[0].toAddress)
+	if bc.PendingTransactions[0].ToAddress != "bob" {
+		t.Fatalf("expected bob, got: %s", bc.PendingTransactions[0].ToAddress)
 	}
-	if bc.wallets["alice"] != 100 {
-		t.Fatalf("expected 100, got: %d", bc.wallets["alice"])
+	if bc.Wallets["alice"] != 100 {
+		t.Fatalf("expected 100, got: %d", bc.Wallets["alice"])
 	}
-	if bc.wallets["bob"] != 100 {
-		t.Fatalf("expected 100, got: %d", bc.wallets["bob"])
+	if bc.Wallets["bob"] != 100 {
+		t.Fatalf("expected 100, got: %d", bc.Wallets["bob"])
 	}
 }
 func TestBlockChainProcessPendingTransaction(t *testing.T) {
@@ -39,8 +39,8 @@ func TestBlockChainProcessPendingTransaction(t *testing.T) {
 	})
 	bc.PerformTransaction("alice", "bob", 10)
 	bc.ProcessPendingTransaction("alice")
-	if len(bc.pendingTransactions) != 1 {
-		t.Fatalf("expected 1, got: %d", len(bc.pendingTransactions))
+	if len(bc.PendingTransactions) != 1 {
+		t.Fatalf("expected 1, got: %d", len(bc.PendingTransactions))
 	}
 	if bc.GetBalance("alice") != 90 {
 		t.Fatalf("expected 90, got: %d", bc.GetBalance("alice"))
@@ -48,8 +48,8 @@ func TestBlockChainProcessPendingTransaction(t *testing.T) {
 	if bc.GetBalance("bob") != 110 {
 		t.Fatalf("expected 110, got: %d", bc.GetBalance("bob"))
 	}
-	if len(bc.chain) != 2 {
-		t.Fatalf("expected 2, got: %d", len(bc.chain))
+	if len(bc.Chain) != 2 {
+		t.Fatalf("expected 2, got: %d", len(bc.Chain))
 	}
 }
 func TestBlockChainProcessPendingMultiplyTransaction(t *testing.T) {
@@ -63,8 +63,8 @@ func TestBlockChainProcessPendingMultiplyTransaction(t *testing.T) {
 	bc.PerformTransaction("alice", "bob", 1000) // not enough balance
 
 	bc.ProcessPendingTransaction("alice")
-	if len(bc.pendingTransactions) != 1 {
-		t.Fatalf("expected 1, got: %d", len(bc.pendingTransactions))
+	if len(bc.PendingTransactions) != 1 {
+		t.Fatalf("expected 1, got: %d", len(bc.PendingTransactions))
 	}
 	if bc.GetBalance("alice") != 0 {
 		t.Fatalf("expected 0, got: %d", bc.GetBalance("alice"))
@@ -72,8 +72,8 @@ func TestBlockChainProcessPendingMultiplyTransaction(t *testing.T) {
 	if bc.GetBalance("bob") != 200 {
 		t.Fatalf("expected 200, got: %d", bc.GetBalance("bob"))
 	}
-	if len(bc.chain) != 2 {
-		t.Fatalf("expected 2, got: %d", len(bc.chain))
+	if len(bc.Chain) != 2 {
+		t.Fatalf("expected 2, got: %d", len(bc.Chain))
 	}
 
 }
@@ -111,12 +111,12 @@ func TestBlockChainValidation(t *testing.T) {
 	}
 
 	//corrupt blockchain
-	bc.chain[1].transactions[0].amount = 1000
+	bc.Chain[1].Transactions[0].Amount = 1000
 	if bc.IsValid() != false {
 		t.Fatalf("blockchain should be invalid")
 	}
 	// fix blockchain
-	bc.chain[1].transactions[0].amount = 10
+	bc.Chain[1].Transactions[0].Amount = 10
 	if bc.IsValid() != true {
 		t.Fatalf("blockchain should be valid")
 	}

@@ -15,18 +15,18 @@ func TestCalculateHash(t *testing.T) {
 
 	exceptedHash := "d7a2dfc97d83691cbaa8c1a88f8191f28add4847bd25fb1b361d950a934d2807"
 	block.calculateHash()
-	if block.hash != exceptedHash {
-		t.Fatalf("expected hash: %s, got: %s", exceptedHash, block.hash)
+	if block.Hash != exceptedHash {
+		t.Fatalf("expected hash: %s, got: %s", exceptedHash, block.Hash)
 	}
 }
 func TestBlockMine(t *testing.T) {
 	block := NewBlock(time.Now(), []Transaction{}, Block{})
-	if block.once != 0 {
-		t.Fatalf("expected once: 0, got: %d", block.once)
+	if block.Once != 0 {
+		t.Fatalf("expected once: 0, got: %d", block.Once)
 	}
 	block.Mine()
-	if block.once == 0 {
-		t.Fatalf("expected once: more then 0, got: %d", block.once)
+	if block.Once == 0 {
+		t.Fatalf("expected once: more then 0, got: %d", block.Once)
 	}
 }
 func TestBlockIsValid(t *testing.T) {
@@ -55,25 +55,25 @@ func TestNewGenesisBlock(t *testing.T) {
 	genesisBlock := NewGenesisBlock(timeStamp)
 	exceptedHash := "d3b5d19ceffdcf5847599fdc55ea39af35817ea0bac8f1346ef20b9dc2b62c00"
 
-	if genesisBlock.index != 0 {
-		t.Fatalf("expected index: 0, got: %d", genesisBlock.index)
+	if genesisBlock.Index != 0 {
+		t.Fatalf("expected index: 0, got: %d", genesisBlock.Index)
 	}
-	if genesisBlock.prevHash != "" {
-		t.Fatalf("expected prevHash: \"\", got: %s", genesisBlock.prevHash)
+	if genesisBlock.PrevHash != "" {
+		t.Fatalf("expected prevHash: \"\", got: %s", genesisBlock.PrevHash)
 	}
-	if genesisBlock.once != 0 {
-		t.Fatalf("expected once: 0, got: %d", genesisBlock.once)
+	if genesisBlock.Once != 0 {
+		t.Fatalf("expected once: 0, got: %d", genesisBlock.Once)
 	}
-	if genesisBlock.hash == "" {
-		t.Fatalf("expected hash: not empty, got: %s", genesisBlock.hash)
+	if genesisBlock.Hash == "" {
+		t.Fatalf("expected hash: not empty, got: %s", genesisBlock.Hash)
 	}
-	if genesisBlock.hash != exceptedHash {
-		t.Fatalf("expected hash: %s, got: %s", exceptedHash, genesisBlock.hash)
+	if genesisBlock.Hash != exceptedHash {
+		t.Fatalf("expected hash: %s, got: %s", exceptedHash, genesisBlock.Hash)
 	}
-	if genesisBlock.timeStamp != timeStamp {
-		t.Fatalf("expected timeStamp: %s, got: %s", timeStamp, genesisBlock.timeStamp)
+	if genesisBlock.TimeStamp != timeStamp {
+		t.Fatalf("expected timeStamp: %s, got: %s", timeStamp, genesisBlock.TimeStamp)
 	}
-	if len(genesisBlock.transactions) != 0 {
-		t.Fatalf("expected transactions: 0, got: %d", len(genesisBlock.transactions))
+	if len(genesisBlock.Transactions) != 0 {
+		t.Fatalf("expected transactions: 0, got: %d", len(genesisBlock.Transactions))
 	}
 }

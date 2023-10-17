@@ -9,22 +9,22 @@ import (
 )
 
 type Transaction struct {
-	id          string
-	fromAddress string
-	toAddress   string
-	amount      int64
+	Id          string `json:"id"`
+	FromAddress string `json:"fromAddress"`
+	ToAddress   string `json:"toAddress"`
+	Amount      int64  `json:"amount"`
 }
 
 func NewTransaction(fromAddress, toAddress string, amount int64) Transaction {
 	return Transaction{
-		id:          GenerateTransactionId(),
-		fromAddress: fromAddress,
-		toAddress:   toAddress,
-		amount:      amount,
+		Id:          GenerateTransactionId(),
+		FromAddress: fromAddress,
+		ToAddress:   toAddress,
+		Amount:      amount,
 	}
 }
 func (t *Transaction) ToString() string {
-	return fmt.Sprintf("%s-%s-%s-%d", t.id, t.fromAddress, t.toAddress, t.amount)
+	return fmt.Sprintf("%s-%s-%s-%d", t.Id, t.FromAddress, t.ToAddress, t.Amount)
 }
 
 func TransactionsToString(transaction []Transaction) string {
