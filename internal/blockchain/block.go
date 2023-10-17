@@ -51,12 +51,11 @@ func (b *Block) Compare(block Block) bool {
 func (b *Block) Mine() {
 	for b.IsValid() == false {
 		b.Once++
-		b.calculateHash()
 	}
 }
 func (b *Block) IsValid() bool {
 	b.calculateHash()
-	return b.Hash[0:2] == strings.Repeat("0", Difficulty)
+	return b.Hash[0:Difficulty] == strings.Repeat("0", Difficulty)
 }
 
 func (b *Block) calculateHash() {

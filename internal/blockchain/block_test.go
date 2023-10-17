@@ -13,7 +13,7 @@ func TestCalculateHash(t *testing.T) {
 	}
 	block := NewBlock(timeStamp, []Transaction{transaction}, Block{})
 
-	exceptedHash := "d7a2dfc97d83691cbaa8c1a88f8191f28add4847bd25fb1b361d950a934d2807"
+	exceptedHash := "7352efd709602b4d10d7b269a305b591b2eb96d24276a72948c53161100e1484"
 	block.calculateHash()
 	if block.Hash != exceptedHash {
 		t.Fatalf("expected hash: %s, got: %s", exceptedHash, block.Hash)
@@ -53,7 +53,7 @@ func TestNewGenesisBlock(t *testing.T) {
 		t.Fatal(err)
 	}
 	genesisBlock := NewGenesisBlock(timeStamp)
-	exceptedHash := "d3b5d19ceffdcf5847599fdc55ea39af35817ea0bac8f1346ef20b9dc2b62c00"
+	exceptedHash := "688db825b8bc7bc8cab97e31f0a04c045955ba01208630a8741b4886567a4fcb"
 
 	if genesisBlock.Index != 0 {
 		t.Fatalf("expected index: 0, got: %d", genesisBlock.Index)

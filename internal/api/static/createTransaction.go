@@ -1,6 +1,6 @@
 package static
 
-var CreateTxForm = `
+const CreateTxForm = `
 <!DOCTYPE html>
 <html lang="ru">
 <meta charset="UTF-8" />

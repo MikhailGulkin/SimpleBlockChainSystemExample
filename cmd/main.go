@@ -1,25 +1,17 @@
 package main
 
+import (
+	"fmt"
+	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/blockchain"
+)
+
 func main() {
-	//err := api.Run()
-	////if err != nil {
-	////	panic(err)
-	////}
-	////bc := blockchain.NewBlockChain(map[string]int64{
-	////	"alice": 100,
-	////	"bob":   100,
-	////})
+	var bc blockchain.BlockChain
+	defer bc.Save()
+	bc.Load()
+	fmt.Println(bc.IsValid())
+
 	////defer bc.Save()
-	////bc.PerformTransaction("alice", "bob", 10)
-	////bc.ProcessPendingTransaction("alice")
-	////fmt.Println(bc.IsValid())
-	////fmt.Printf("%+v", bc)
-	//////bc.PerformTransaction("alice", "bob", 10)
-	//////bc.PerformTransaction("alice", "bob", 10)
-	//////bc.PerformTransaction("alice", "bob", 10)
-	//////bc.PerformTransaction("alice", "bob", 10)
-	////
-	////bc.ProcessPendingTransaction("alice")
 	////
 	//var bc1 blockchain.BlockChain
 	//
