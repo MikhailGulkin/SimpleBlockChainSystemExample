@@ -38,7 +38,10 @@ func TestBlockChainProcessPendingTransaction(t *testing.T) {
 		"bob":   100,
 	})
 	bc.PerformTransaction("alice", "bob", 10)
-	bc.ProcessPendingTransaction("alice")
+	err := bc.ProcessPendingTransaction("alice")
+	if err != nil {
+		t.Fatalf("expected nil, got: %s", err.Error())
+	}
 	if len(bc.PendingTransactions) != 1 {
 		t.Fatalf("expected 1, got: %d", len(bc.PendingTransactions))
 	}
@@ -62,7 +65,10 @@ func TestBlockChainProcessPendingMultiplyTransaction(t *testing.T) {
 
 	bc.PerformTransaction("alice", "bob", 1000) // not enough balance
 
-	bc.ProcessPendingTransaction("alice")
+	err := bc.ProcessPendingTransaction("alice")
+	if err != nil {
+		t.Fatalf("expected nil, got: %s", err.Error())
+	}
 	if len(bc.PendingTransactions) != 1 {
 		t.Fatalf("expected 1, got: %d", len(bc.PendingTransactions))
 	}
@@ -85,7 +91,10 @@ func TestBlockChainTransactionCompletion(t *testing.T) {
 	id := bc.PerformTransaction("alice", "bob", 10)
 
 	errorTxID := bc.PerformTransaction("alice", "bob", 1000) // not enough balance
-	bc.ProcessPendingTransaction("alice")
+	err := bc.ProcessPendingTransaction("alice")
+	if err != nil {
+		t.Fatalf("expected nil, got: %s", err.Error())
+	}
 
 	if bc.CheckTransactionCompletion(id) != true {
 		t.Fatalf("expected true, got: false")
@@ -101,10 +110,16 @@ func TestBlockChainValidation(t *testing.T) {
 	})
 	bc.PerformTransaction("alice", "bob", 10)
 	bc.PerformTransaction("alice", "bob", 90)
-	bc.ProcessPendingTransaction("alice")
+	err := bc.ProcessPendingTransaction("alice")
+	if err != nil {
+		t.Fatalf("expected nil, got: %s", err.Error())
+	}
 	bc.PerformTransaction("bob", "alice", 50)
 	bc.PerformTransaction("bob", "alice", 50)
-	bc.ProcessPendingTransaction("bob")
+	err = bc.ProcessPendingTransaction("bob")
+	if err != nil {
+		t.Fatalf("expected nil, got: %s", err.Error())
+	}
 
 	if bc.IsValid() != true {
 		t.Fatalf("expected true, got: false")
@@ -119,6 +134,30 @@ func TestBlockChainValidation(t *testing.T) {
 	bc.Chain[1].Transactions[0].Amount = 10
 	if bc.IsValid() != true {
 		t.Fatalf("blockchain should be valid")
+	}
+
+}
+
+func TestBlockChainProcessingEror(t *testing.T) {
+	bc := NewBlockChain(map[string]int64{
+		"alice": 100,
+		"bob":   100,
+	})
+	bc.PerformTransaction("alice", "bob", 10)
+	bc.PerformTransaction("alice", "bob", 90)
+
+	if err := bc.ProcessPendingTransaction("some"); err == nil {
+		t.Fatalf("except error, got: nil")
+	}
+	if err := bc.ProcessPendingTransaction("alice"); err != nil {
+		t.Fatalf("except nil, got: %s", err.Error())
+	}
+	bc = NewBlockChain(map[string]int64{
+		"alice": 100,
+		"bob":   100,
+	})
+	if err := bc.ProcessPendingTransaction("alice"); err == nil {
+		t.Fatalf("except error, got: nil")
 	}
 
 }
