@@ -60,6 +60,14 @@ const CreateTxForm = `
             <ul id="wallets"></ul>
         </div>
     </div>
+	<div style="text-align: center">
+        <h2>Пороверить валидность блокчейна</h2>
+        <button id="checkBC">Проверить</button>
+        <div>
+            <p id="checkStatusBlockChainField"></p>
+        </div>
+    </div>
+	
 </div>
 
 
@@ -68,6 +76,7 @@ const CreateTxForm = `
     const checkStatusTransactionResultField = document.getElementById('checkStatusTransactionResultField');
     const mineResultField = document.getElementById('mineResultField');
     const wallets = document.getElementById('wallets');
+    const blockChain = document.getElementById('checkStatusBlockChainField');
 
     function sendTransaction(event) {
         event.preventDefault();
@@ -163,7 +172,20 @@ const CreateTxForm = `
             });
 
     }
+	 function checkBC(event) {
+        event.preventDefault();
+        blockChain.innerHTML = '';
 
+        fetch('http://localhost:8000/check-bc-validity')
+            .then(response => response.json())
+            .then(data => {
+                blockChain.innerHTML = JSON.stringify(data, null, 4);
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error);
+            });
+
+    }
     const transactionForm = document.getElementById('transactionForm');
     transactionForm.addEventListener('submit', sendTransaction);
 
@@ -175,6 +197,9 @@ const CreateTxForm = `
 
     const getWalletsButton = document.getElementById('getWallets');
     getWalletsButton.addEventListener('click', getWallets);
+
+	const checkBCButton = document.getElementById('checkBC');
+	checkBCButton.addEventListener('click', checkBC);
 </script>
 </body>
 </html>

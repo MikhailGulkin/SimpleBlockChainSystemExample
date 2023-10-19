@@ -28,4 +28,7 @@ type (
 	WalletResponse struct {
 		Wallets map[string]int64 `json:"wallets"`
 	}
+	BlockChainValidityResponse struct {
+		IsValid bool `json:"isValid"`
+	}
 )

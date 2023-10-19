@@ -116,3 +116,17 @@ func (h *Handlers) getWallets(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
 }
+func (h *Handlers) checkBlockChainValidity(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		res := BlockChainValidityResponse{
+			IsValid: h.blockChain.IsValid(),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(res); err != nil {
+			http.Error(w, "Ошибка при отправке JSON-ответа", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
+}

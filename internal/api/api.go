@@ -19,6 +19,7 @@ func (h *Server) SetupRoutes() {
 	http.HandleFunc("/mine", h.handlers.mineHandler)
 	http.HandleFunc("/check-tx-status", h.handlers.checkTransactionStatus)
 	http.HandleFunc("/get-wallets", h.handlers.getWallets)
+	http.HandleFunc("/check-bc-validity", h.handlers.checkBlockChainValidity)
 }
 
 func (h *Server) Run() {
