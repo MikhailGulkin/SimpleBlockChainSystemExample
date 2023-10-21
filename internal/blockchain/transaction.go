@@ -1,33 +1,60 @@
 package blockchain
 
 import (
+	"crypto/ecdsa"
+	"crypto/sha256"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"strings"
+	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 )
 
 type Transaction struct {
-	Id          string `json:"id"`
 	FromAddress string `json:"fromAddress"`
 	ToAddress   string `json:"toAddress"`
 	Amount      int64  `json:"amount"`
 }
 
-func NewTransaction(fromAddress, toAddress string, amount int64) Transaction {
-	return Transaction{
-		Id:          GenerateTransactionId(),
+func NewTransaction(fromAddress, toAddress string, amount int64) *Transaction {
+	return &Transaction{
 		FromAddress: fromAddress,
 		ToAddress:   toAddress,
 		Amount:      amount,
 	}
 }
-func (t *Transaction) ToString() string {
-	return fmt.Sprintf("%s-%s-%s-%d", t.Id, t.FromAddress, t.ToAddress, t.Amount)
+
+func (bc *BlockChain) AddTransaction(
+	fromAddress string,
+	toAddress string,
+	amount int64,
+	senderPublicKey *ecdsa.PublicKey,
+	signature *utils.Signature,
+) (bool, error) {
+	t := NewTransaction(fromAddress, toAddress, amount)
+	if fromAddress == MiningSender {
+		bc.PendingTransactions = append(bc.PendingTransactions, t)
+		return true, nil
+	}
+	if !bc.VerifyTransactionSignature(senderPublicKey, signature, t) {
+		return false, errors.New("invalid signature")
+	}
+	balance, err := bc.GetBalance(fromAddress)
+	if err != nil {
+		return false, fmt.Errorf("error: %s", err)
+	}
+	if balance < amount {
+		return false, errors.New("not enough balance")
+	}
+	bc.PendingTransactions = append(bc.PendingTransactions, t)
+	return true, nil
 }
 
-func TransactionsToString(transaction []Transaction) string {
-	var str strings.Builder
-	for _, tx := range transaction {
-		str.WriteString(tx.ToString())
-	}
-	return str.String()
+func (bc *BlockChain) VerifyTransactionSignature(
+	senderPublicKey *ecdsa.PublicKey,
+	s *utils.Signature,
+	t *Transaction,
+) bool {
+	m, _ := json.Marshal(t)
+	h := sha256.Sum256(m)
+	return ecdsa.Verify(senderPublicKey, h[:], s.R, s.S)
 }
