@@ -3,7 +3,6 @@ package blockchain
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"log"
 )
@@ -64,8 +63,26 @@ func (bc *BlockChain) CopyTransactionPool() []*Transaction {
 	}
 	return transactions
 }
+func (bc *BlockChain) GetWallets() map[string]int64 {
+	set := make(map[string]int64)
+	for _, b := range bc.Chain {
+		for _, t := range b.Transactions {
+			if t.FromAddress != MiningSender && t.FromAddress != bc.BlockChainAddress {
+				set[t.FromAddress] = 0
+			}
+			if t.ToAddress != MiningSender && t.ToAddress != bc.BlockChainAddress {
+				set[t.ToAddress] = 0
+			}
+		}
+	}
+	for key := range set {
+		set[key], _ = bc.GetBalance(key)
+	}
+	return set
+}
+
 func (bc *BlockChain) Load() {
-	err := utils.Load(bc, fmt.Sprintf("%s/%s.json", utils.Dir, "block_chain"))
+	err := utils.Load(bc, "block_chain")
 	if err != nil {
 		log.Printf("error while loading block chain: %s", err.Error())
 	}
@@ -82,7 +99,7 @@ func (bc *BlockChain) Save() {
 	if err != nil {
 		log.Printf("error while marshalling block chain: %s", err.Error())
 	}
-	if err := utils.Save(marshall, fmt.Sprintf("%s/%s.json", utils.Dir, "block_chain")); err != nil {
+	if err := utils.Save(marshall, "block_chain"); err != nil {
 		log.Printf("error while saving block chain: %s", err.Error())
 	}
 }

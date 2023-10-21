@@ -60,21 +60,18 @@ func (bc *BlockChain) ValidChain(chain []*Block) bool {
 
 func (bc *BlockChain) StartMining() {
 	bc.Mining()
-	// Schedule the next mining operation to occur after MINING_TIMER_SEC seconds.
-	_ = time.AfterFunc(time.Second*MINING_TIMER_SEC, bc.StartMining)
+
+	_ = time.AfterFunc(time.Second*MiningTimerSec, bc.StartMining)
 }
 
 func (bc *BlockChain) RegisterNewWallet(blockchainAddress string) bool {
 
-	// Add a transaction for the new wallet
 	_, err := bc.AddTransaction(MiningSender, blockchainAddress, 0, nil, nil)
 
-	// If an error occurred adding the transaction, log the error and return false
 	if err != nil {
 		log.Printf("ERROR: %v", err)
 		return false
 	}
 	bc.StartMining()
-	// Return true indicating the wallet was registered successfully
 	return true
 }

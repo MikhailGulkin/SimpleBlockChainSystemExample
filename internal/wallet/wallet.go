@@ -6,15 +6,14 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/json"
-	"fmt"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"log"
 )
 
 type Wallet struct {
-	PrivateKey *ecdsa.PrivateKey
-	PublicKey  *ecdsa.PublicKey
-	Address    string
+	PrivateKey *ecdsa.PrivateKey `json:"privateKey"`
+	PublicKey  *ecdsa.PublicKey  `json:"publicKey"`
+	Address    string            `json:"address"`
 }
 
 func NewWallet() *Wallet {
@@ -25,26 +24,6 @@ func NewWallet() *Wallet {
 
 	w.Address = generateAddressFromKeys(w.PublicKey)
 	return w
-}
-
-func (w *Wallet) PrivateKeyStr() string {
-	return fmt.Sprintf("%x", w.PrivateKey.D.Bytes())
-}
-
-func (w *Wallet) PublicKeyStr() string {
-	return fmt.Sprintf("%064x%064x", w.PublicKey.X.Bytes(), w.PublicKey.Y.Bytes())
-}
-
-func (w *Wallet) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		PrivateKey        string `json:"PrivateKey"`
-		PublicKey         string `json:"PublicKey"`
-		BlockchainAddress string `json:"blockchainAddress"`
-	}{
-		PrivateKey:        w.PrivateKeyStr(),
-		PublicKey:         w.PublicKeyStr(),
-		BlockchainAddress: w.Address,
-	})
 }
 
 type Transaction struct {

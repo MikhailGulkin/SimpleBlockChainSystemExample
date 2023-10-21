@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 )
@@ -13,7 +14,7 @@ const (
 func Save(data []byte, fileName string) error {
 	os.Mkdir(Dir, 0755)
 	file, err := os.OpenFile(
-		fileName,
+		fmt.Sprintf("%s/%s.json", Dir, fileName),
 		os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644,
 	)
 	if err != nil {
@@ -35,7 +36,7 @@ func Save(data []byte, fileName string) error {
 
 func Load(object interface{}, fileName string) error {
 	file, err := os.OpenFile(
-		fileName,
+		fmt.Sprintf("%s/%s.json", Dir, fileName),
 		os.O_RDONLY, 0644,
 	)
 	if err != nil {
