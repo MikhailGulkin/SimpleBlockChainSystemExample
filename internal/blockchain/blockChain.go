@@ -96,6 +96,7 @@ func (bc *BlockChain) CopyTransactionPool() []*Transaction {
 			t.Amount,
 		)
 		tx.Id = t.Id
+		tx.Time = t.Time
 		transactions = append(transactions, tx)
 	}
 	return transactions
