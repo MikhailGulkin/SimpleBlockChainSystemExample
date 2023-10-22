@@ -49,7 +49,6 @@ func (w *Wallet) MarshalJSON() ([]byte, error) {
 	publicKeyXBytes := w.PublicKey.X.Bytes()
 	publicKeyYBytes := w.PublicKey.Y.Bytes()
 
-	type Alias Wallet
 	return json.Marshal(&struct {
 		Address    string `json:"address"`
 		PrivateKey []byte `json:"privateKey"`
@@ -64,7 +63,6 @@ func (w *Wallet) MarshalJSON() ([]byte, error) {
 }
 
 func (w *Wallet) UnmarshalJSON(data []byte) error {
-	type Alias Wallet
 	aux := &struct {
 		Address    string `json:"address"`
 		PrivateKey []byte `json:"privateKey"`

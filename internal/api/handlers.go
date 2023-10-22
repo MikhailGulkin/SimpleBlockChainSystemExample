@@ -23,7 +23,7 @@ func NewHandlers(wallets *wallet.Wallets, bc *blockchain.BlockChain) *Handlers {
 func (h *Handlers) transactionFormHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(static.CreateTxForm))
+		w.Write([]byte(static.CreateTxForm)) //nolint:errcheck
 	}
 }
 
@@ -45,7 +45,7 @@ func (h *Handlers) processTransaction(w http.ResponseWriter, r *http.Request) {
 		user1 := h.wallets.GetWallet(req.Sender)
 		user2 := h.wallets.GetWallet(req.Receiver)
 		if user1 == nil || user2 == nil {
-			http.Error(w, "Ошибка при чтении JSON", http.StatusBadRequest)
+			http.Error(w, "Один из пользователей временно не доступен или не существует", http.StatusBadRequest)
 			return
 		}
 		tx := wallet.NewTransaction(
@@ -165,10 +165,37 @@ func (h *Handlers) createWallet(writer http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		writer.Header().Set("Content-Type", "application/json")
 
-		w := wallet.NewWallet()
+		w := h.wallets.NewWallet()
 		h.blockChain.RegisterNewWallet(w.Address)
 		res := CreateWalletResponse{
 			Address: w.Address,
+		}
+		if err := json.NewEncoder(writer).Encode(res); err != nil {
+			http.Error(writer, "Ошибка при отправке JSON-ответа", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
+
+}
+func (h *Handlers) getWalletTransactions(writer http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		writer.Header().Set("Content-Type", "application/json")
+
+		address := r.URL.Query().Get("address")
+		if address == "" {
+			http.Error(writer, "Не указан адрес", http.StatusBadRequest)
+			return
+		}
+		user := h.wallets.GetWallet(address)
+		if user == nil {
+			http.Error(writer, "Пользователь не найден", http.StatusBadRequest)
+			return
+		}
+		transactions := h.blockChain.GetWalletTransactions(user.Address)
+		res := AllWalletTransactionsResponse{
+			Transactions: transactions,
 		}
 		if err := json.NewEncoder(writer).Encode(res); err != nil {
 			http.Error(writer, "Ошибка при отправке JSON-ответа", http.StatusInternalServerError)

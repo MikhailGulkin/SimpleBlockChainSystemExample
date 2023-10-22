@@ -1,5 +1,7 @@
 package api
 
+import "github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/blockchain"
+
 type (
 	TransactionRequest struct {
 		Sender   string `json:"sender,omitempty"`
@@ -30,6 +32,9 @@ type (
 	}
 	WalletResponse struct {
 		Wallet string `json:"wallet"`
+	}
+	AllWalletTransactionsResponse struct {
+		Transactions []*blockchain.Transaction `json:"transactions"`
 	}
 	CreateWalletResponse struct {
 		Address string `json:"address"`

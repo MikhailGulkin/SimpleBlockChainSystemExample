@@ -7,11 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
+	"time"
 )
 
 type Transaction struct {
 	Id              string                `json:"id"`
 	FromAddress     string                `json:"fromAddress"`
+	Time            string                `json:"time"`
 	ToAddress       string                `json:"toAddress"`
 	TransactionType utils.TransactionType `json:"transactionType"`
 	Amount          int64                 `json:"amount"`
@@ -20,6 +22,7 @@ type Transaction struct {
 func NewTransaction(fromAddress, toAddress string, transactionType utils.TransactionType, amount int64) *Transaction {
 	return &Transaction{
 		Id:              utils.GenerateId(),
+		Time:            time.Now().Format("2006.01.02 15:04:05"),
 		FromAddress:     fromAddress,
 		ToAddress:       toAddress,
 		TransactionType: transactionType,
@@ -36,7 +39,7 @@ func (bc *BlockChain) AddTransaction(
 	signature *utils.Signature,
 ) (string, error) {
 	t := NewTransaction(fromAddress, toAddress, transactionType, amount)
-	if fromAddress == MiningSender {
+	if fromAddress == MiningSender || fromAddress == bc.BlockChainAddress {
 		bc.PendingTransactions = append(bc.PendingTransactions, t)
 		return t.Id, nil
 	}

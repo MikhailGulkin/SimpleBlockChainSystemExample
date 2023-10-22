@@ -123,6 +123,17 @@ func (bc *BlockChain) GetWallets() map[string]int64 {
 	}
 	return set
 }
+func (bc *BlockChain) GetWalletTransactions(address string) []*Transaction {
+	var transactions []*Transaction
+	for _, b := range bc.Chain {
+		for _, t := range b.Transactions {
+			if t.FromAddress == address || t.ToAddress == address {
+				transactions = append(transactions, t)
+			}
+		}
+	}
+	return transactions
+}
 
 func (bc *BlockChain) Load() {
 	err := utils.Load(bc, "block_chain")

@@ -1,6 +1,3 @@
-package static
-
-const CreateTxForm = `
 <!DOCTYPE html>
 <html lang="ru">
 <meta charset="UTF-8"/>
@@ -89,18 +86,17 @@ const CreateTxForm = `
         </div>
     </div>
 
-	<div class="item">
+    <div class="item">
         <h2>Получить транзакции пользователя</h2>
-		<form id="getWalletTransactionsForm">
+        <form id="walletTransactionsForm">
             <label for="transaction">Адресс кошелька:</label>
             <input type="text" id="transaction" name="address" required><br><br>
 
             <input type="submit" value="Получить транзакции">
         </form>
-        <div>
-            <p id="walletTransactionsField"></p>
-        </div>    
-	</div>
+        <div id="walletTransactionsContainer">
+        </div>
+    </div>
 </div>
 
 <script>
@@ -110,7 +106,7 @@ const CreateTxForm = `
     const wallets = document.getElementById('wallets');
     const blockChain = document.getElementById('checkStatusBlockChainField');
     const createWalletField = document.getElementById('createWalletField');
-    const getWalletTransactionsField = document.getElementById('walletTransactionsField');
+    const getWalletTransactionsContainer = document.getElementById('walletTransactionsContainer');
 
     function sendTransaction(event) {
         event.preventDefault();
@@ -240,30 +236,43 @@ const CreateTxForm = `
                 console.error('Произошла ошибка:', error);
             });
     }
-	function getWalletTransactions(event) {
-			event.preventDefault();
-			getWalletTransactionsField.innerHTML = '';
- 		const form = document.getElementById('getWalletTransactionsForm');
+
+    function getWalletTransactions(event) {
+        event.preventDefault();
+        getWalletTransactionsContainer.innerHTML = '';
+        const form = document.getElementById('walletTransactionsForm');
 
         const formData = new FormData(form);
         form.reset();
-	
-		fetch('http://localhost:8000/get-wallet-transactions', {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			method: 'POST',
- body: JSON.stringify(Object.fromEntries(formData))
-		})
-			.then(response => response.json())
-			.then(data => {
-				getWalletTransactionsField.innerHTML = JSON.stringify(data, null, 4);
-			})
-			.catch(error => {
-				console.error('Произошла ошибка:', error);	
-			});
-	}	
+
+        fetch(`http://localhost:8000/get-wallet-transactions?address=${formData.get("address")}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                data.transactions.forEach(
+                    item => {
+                        const transaction = document.createElement('div');
+                        transaction.innerHTML = `<hr><p>Отправитель: ${item.fromAddress}</p>
+                                                 <p>Получатель: ${item.toAddress}</p>
+                                                 <p>Сумма: ${item.amount}</p>
+                                                 <p>Тип: ${item.transactionType}</p>
+                                                 <p>Айди: ${item.id}</p>
+                                                 <p>Время: ${item.time}</p>
+                                                 <hr>`
+                        getWalletTransactionsContainer.appendChild(transaction);
+                    }
+                )
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error);
+            });
+    }
 
     const transactionForm = document.getElementById('transactionForm');
     transactionForm.addEventListener('submit', sendTransaction);
@@ -283,9 +292,8 @@ const CreateTxForm = `
     const createWalletButton = document.getElementById('createWallet');
     createWalletButton.addEventListener('click', createWallet);
 
-	const getWalletTransactionsButton = document.getElementById('getWalletTransactionsForm');
-	getWalletTransactionsButton.addEventListener('click', getWalletTransactionsForm);
+    const getWalletTransactionsButton = document.getElementById('walletTransactionsForm');
+    getWalletTransactionsButton.addEventListener('submit', getWalletTransactions);
 </script>
 </body>
 </html>
-`

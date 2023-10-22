@@ -13,7 +13,7 @@ const (
 )
 
 type Block struct {
-	TimeStamp    time.Time      `json:"timeStamp"`
+	TimeStamp    string         `json:"timeStamp"`
 	PrevHash     [32]byte       `json:"prevHash"`
 	Transactions []*Transaction `json:"transactions"`
 	Nonce        int64          `json:"once"`
@@ -21,7 +21,7 @@ type Block struct {
 
 func NewBlock(nonce int64, previousHash [32]byte, transactions []*Transaction) *Block {
 	b := new(Block)
-	b.TimeStamp = time.Now()
+	b.TimeStamp = time.Now().Format("2006.01.02 15:04:05")
 	b.Nonce = nonce
 	b.PrevHash = previousHash
 	b.Transactions = transactions

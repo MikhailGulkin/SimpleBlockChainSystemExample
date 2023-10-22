@@ -6,7 +6,6 @@ import (
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"log"
 	"strings"
-	"time"
 )
 
 func (bc *BlockChain) Mining(address string) error {
@@ -40,12 +39,9 @@ func (bc *BlockChain) ProofOfWork() int64 {
 }
 func (bc *BlockChain) ValidProof(nonce int64, previousHash [32]byte, transactions []*Transaction, difficulty int) bool {
 	zeros := strings.Repeat("0", difficulty)
-	guessBlock := Block{time.Time{}, previousHash, transactions, nonce}
+	guessBlock := Block{"", previousHash, transactions, nonce}
 	guessHashStr := fmt.Sprintf("%x", guessBlock.Hash())
-	if guessHashStr[:difficulty] == zeros {
-		return true
-	}
-	return false
+	return guessHashStr[:difficulty] == zeros
 }
 func (bc *BlockChain) ValidChain(chain []*Block) bool {
 	preBlock := chain[0]
@@ -66,16 +62,12 @@ func (bc *BlockChain) ValidChain(chain []*Block) bool {
 }
 
 func (bc *BlockChain) RegisterNewWallet(blockchainAddress string) bool {
-
 	_, err := bc.AddTransaction(MiningSender, blockchainAddress, 0, utils.WalletCreate, nil, nil)
-
 	if err != nil {
 		log.Printf("ERROR: %v", err)
 		return false
 	}
 	err = bc.Mining(bc.BlockChainAddress)
-	if err != nil {
-		return false
-	}
-	return true
+
+	return err == nil
 }
