@@ -5,12 +5,15 @@ import (
 	"errors"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type BlockChain struct {
-	Chain               []*Block
-	PendingTransactions []*Transaction
-	BlockChainAddress   string
+	Chain               []*Block       `json:"chain"`
+	PendingTransactions []*Transaction `json:"pendingTransactions"`
+	BlockChainAddress   string         `json:"blockChainAddress"`
 }
 
 func NewBlockChain(address string) *BlockChain {
@@ -19,6 +22,9 @@ func NewBlockChain(address string) *BlockChain {
 	bc.BlockChainAddress = address
 	bc.CreateBlock(0, b.Hash())
 	return bc
+}
+func (bc *BlockChain) GetChain() []*Block {
+	return bc.Chain
 }
 
 func (bc *BlockChain) CreateBlock(once int64, prevHash [32]byte) *Block {
@@ -30,8 +36,7 @@ func (bc *BlockChain) CreateBlock(once int64, prevHash [32]byte) *Block {
 func (bc *BlockChain) LastBlock() *Block {
 	return bc.Chain[len(bc.Chain)-1]
 }
-
-func (bc *BlockChain) GetBalance(address string) (int64, error) {
+func (bc *BlockChain) GetFixedBalance(address string) (int64, error) {
 	var balance int64
 	addressFound := false
 	for _, b := range bc.Chain {
@@ -51,32 +56,70 @@ func (bc *BlockChain) GetBalance(address string) (int64, error) {
 	}
 	return balance, nil
 }
+func (bc *BlockChain) GetBalance(address string) (int64, error) {
+	var balance int64
+	addressFound := false
+	for _, b := range bc.Chain {
+		for _, t := range b.Transactions {
+			if t.FromAddress == address {
+				balance -= t.Amount
+				addressFound = true
+			}
+			if t.ToAddress == address {
+				balance += t.Amount
+				addressFound = true
+			}
+		}
+	}
+	for _, t := range bc.PendingTransactions {
+		if t.FromAddress == address {
+			balance -= t.Amount
+			addressFound = true
+		}
+		if t.ToAddress == address {
+			balance += t.Amount
+			addressFound = true
+		}
+	}
+	if !addressFound {
+		return 0, errors.New("address not found")
+	}
+	return balance, nil
+}
 func (bc *BlockChain) CopyTransactionPool() []*Transaction {
 	transactions := make([]*Transaction, 0)
 	for _, t := range bc.PendingTransactions {
-		transactions = append(transactions,
-			NewTransaction(
-				t.FromAddress,
-				t.ToAddress,
-				t.Amount,
-			))
+		tx := NewTransaction(
+			t.FromAddress,
+			t.ToAddress,
+			t.TransactionType,
+			t.Amount,
+		)
+		tx.Id = t.Id
+		transactions = append(transactions, tx)
 	}
 	return transactions
+}
+func (bc *BlockChain) CheckTransactionCompletion(id string) bool {
+	for _, b := range bc.Chain {
+		if b.CheckTransactionCompletion(id) {
+			return true
+		}
+	}
+	return false
+
 }
 func (bc *BlockChain) GetWallets() map[string]int64 {
 	set := make(map[string]int64)
 	for _, b := range bc.Chain {
 		for _, t := range b.Transactions {
-			if t.FromAddress != MiningSender && t.FromAddress != bc.BlockChainAddress {
-				set[t.FromAddress] = 0
-			}
-			if t.ToAddress != MiningSender && t.ToAddress != bc.BlockChainAddress {
+			if t.TransactionType == utils.WalletCreate {
 				set[t.ToAddress] = 0
 			}
 		}
 	}
 	for key := range set {
-		set[key], _ = bc.GetBalance(key)
+		set[key], _ = bc.GetFixedBalance(key)
 	}
 	return set
 }
@@ -86,16 +129,16 @@ func (bc *BlockChain) Load() {
 	if err != nil {
 		log.Printf("error while loading block chain: %s", err.Error())
 	}
-	//c := make(chan os.Signal)
-	//signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	//go func() {
-	//	<-c
-	//	bc.Save()
-	//	os.Exit(1)
-	//}()
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		bc.Save()
+		os.Exit(1)
+	}()
 }
 func (bc *BlockChain) Save() {
-	marshall, err := json.Marshal(&bc)
+	marshall, err := json.Marshal(bc)
 	if err != nil {
 		log.Printf("error while marshalling block chain: %s", err.Error())
 	}

@@ -7,9 +7,21 @@ const CreateTxForm = `
 <head>
     <title>Форма для перевода</title>
 </head>
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        padding-left: 100px;
+    }
+
+    .item {
+    }
+
+</style>
 <body>
-<div style="display: flex; justify-content: space-between">
-    <div style="text-align: center;">
+<div class="container">
+    <div class="item">
         <h2>Перевод транзакции</h2>
         <form id="transactionForm">
             <label for="sender">От кого:</label>
@@ -28,7 +40,7 @@ const CreateTxForm = `
         </div>
     </div>
 
-    <div style="text-align: center;">
+    <div class="item">
         <h2>Узнать статус транзакции</h2>
         <form id="checkStatusTransactionForm">
             <label for="checkTxStatus">Айди транзакции:</label>
@@ -41,7 +53,7 @@ const CreateTxForm = `
         </div>
     </div>
 
-    <div style="text-align: center;">
+    <div class="item">
         <h2>Обработать все транзакции и создать блок(Майнить)</h2>
         <form id="mineForm">
             <label for="mine">Адресс майнера:</label>
@@ -53,21 +65,22 @@ const CreateTxForm = `
             <p id="mineResultField"></p>
         </div>
     </div>
-    <div style="text-align: center">
+    <div class="item">
         <h2>Получить все кошельки</h2>
         <button id="getWallets">Получить</button>
         <div>
             <ul id="wallets"></ul>
         </div>
     </div>
-	<div style="text-align: center">
+
+    <div class="item">
         <h2>Пороверить валидность блокчейна</h2>
         <button id="checkBC">Проверить</button>
         <div>
             <p id="checkStatusBlockChainField"></p>
         </div>
     </div>
-	
+
 </div>
 
 
@@ -85,7 +98,7 @@ const CreateTxForm = `
         const form = document.getElementById('transactionForm');
 
         const formData = new FormData(form);
-        form.reset();
+        // form.reset();
 
 
         fetch('http://localhost:8000/process-transaction', {
@@ -96,7 +109,7 @@ const CreateTxForm = `
             method: 'POST',
             body: JSON.stringify(Object.fromEntries(formData))
         })
-            .then(response => response.json())
+            .then(response => response.text())
             .then(data => {
                 transactionResultField.innerHTML = JSON.stringify(data, null, 4);
             })
@@ -158,6 +171,7 @@ const CreateTxForm = `
             });
 
     }
+
     function getWallets(event) {
         event.preventDefault();
         wallets.innerHTML = '';
@@ -172,7 +186,8 @@ const CreateTxForm = `
             });
 
     }
-	 function checkBC(event) {
+
+    function checkBC(event) {
         event.preventDefault();
         blockChain.innerHTML = '';
 
@@ -186,6 +201,7 @@ const CreateTxForm = `
             });
 
     }
+
     const transactionForm = document.getElementById('transactionForm');
     transactionForm.addEventListener('submit', sendTransaction);
 
@@ -198,8 +214,8 @@ const CreateTxForm = `
     const getWalletsButton = document.getElementById('getWallets');
     getWalletsButton.addEventListener('click', getWallets);
 
-	const checkBCButton = document.getElementById('checkBC');
-	checkBCButton.addEventListener('click', checkBC);
+    const checkBCButton = document.getElementById('checkBC');
+    checkBCButton.addEventListener('click', checkBC);
 </script>
 </body>
 </html>

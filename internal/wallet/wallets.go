@@ -15,6 +15,15 @@ func NewWallets() *Wallets {
 		Wallets: make([]*Wallet, 0),
 	}
 }
+func (w *Wallets) GetWallet(address string) *Wallet {
+	for _, wallet := range w.Wallets {
+		if wallet.Address == address {
+			return wallet
+		}
+	}
+	return nil
+}
+
 func (w *Wallets) NewWallet() *Wallet {
 	wallet := NewWallet()
 	w.Wallets = append(w.Wallets, wallet)
@@ -31,7 +40,7 @@ func (w *Wallets) Save() {
 	}
 }
 func (w *Wallets) Load() {
-	err := utils.Load(w, "wallet")
+	err := utils.Load(&w, "wallet")
 	if err != nil {
 		log.Println("error: ", err)
 	}

@@ -3,16 +3,23 @@ package blockchain
 import (
 	"errors"
 	"fmt"
+	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"log"
 	"strings"
 	"time"
 )
 
-func (bc *BlockChain) Mining() error {
+func (bc *BlockChain) Mining(address string) error {
 	if len(bc.PendingTransactions) == 0 {
 		return errors.New("no transactions")
 	}
-	_, err := bc.AddTransaction(MiningSender, bc.BlockChainAddress, MiningReward, nil, nil)
+	if address == "" {
+		return errors.New("address is empty")
+	}
+	if _, ok := bc.GetWallets()[address]; !ok && address != bc.BlockChainAddress {
+		return errors.New("invalid address")
+	}
+	_, err := bc.AddTransaction(MiningSender, address, MiningReward, utils.Mining, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -58,20 +65,17 @@ func (bc *BlockChain) ValidChain(chain []*Block) bool {
 
 }
 
-func (bc *BlockChain) StartMining() {
-	bc.Mining()
-
-	_ = time.AfterFunc(time.Second*MiningTimerSec, bc.StartMining)
-}
-
 func (bc *BlockChain) RegisterNewWallet(blockchainAddress string) bool {
 
-	_, err := bc.AddTransaction(MiningSender, blockchainAddress, 0, nil, nil)
+	_, err := bc.AddTransaction(MiningSender, blockchainAddress, 0, utils.WalletCreate, nil, nil)
 
 	if err != nil {
 		log.Printf("ERROR: %v", err)
 		return false
 	}
-	bc.StartMining()
+	err = bc.Mining(bc.BlockChainAddress)
+	if err != nil {
+		return false
+	}
 	return true
 }

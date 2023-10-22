@@ -25,8 +25,11 @@ type (
 		Message string `json:"message"`
 	}
 
-	WalletResponse struct {
+	WalletsResponse struct {
 		Wallets map[string]int64 `json:"wallets"`
+	}
+	WalletResponse struct {
+		Wallet string `json:"wallet"`
 	}
 	BlockChainValidityResponse struct {
 		IsValid bool `json:"isValid"`

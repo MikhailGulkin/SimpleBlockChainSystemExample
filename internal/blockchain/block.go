@@ -10,7 +10,6 @@ const (
 	MiningDifficulty = 3
 	MiningSender     = "THE BLOCKCHAIN"
 	MiningReward     = 1.0
-	MiningTimerSec   = 20
 )
 
 type Block struct {
@@ -31,4 +30,12 @@ func NewBlock(nonce int64, previousHash [32]byte, transactions []*Transaction) *
 func (b *Block) Hash() [32]byte {
 	m, _ := json.Marshal(b)
 	return sha256.Sum256(m)
+}
+func (b *Block) CheckTransactionCompletion(id string) bool {
+	for _, t := range b.Transactions {
+		if t.Id == id {
+			return true
+		}
+	}
+	return false
 }

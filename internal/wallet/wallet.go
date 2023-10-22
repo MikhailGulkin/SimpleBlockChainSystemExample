@@ -4,16 +4,15 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/json"
-	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
-	"log"
+	"fmt"
+	"math/big"
 )
 
 type Wallet struct {
-	PrivateKey *ecdsa.PrivateKey `json:"privateKey"`
-	PublicKey  *ecdsa.PublicKey  `json:"publicKey"`
-	Address    string            `json:"address"`
+	PrivateKey *ecdsa.PrivateKey
+	PublicKey  *ecdsa.PublicKey
+	Address    string `json:"address"`
 }
 
 func NewWallet() *Wallet {
@@ -25,52 +24,68 @@ func NewWallet() *Wallet {
 	w.Address = generateAddressFromKeys(w.PublicKey)
 	return w
 }
-
-type Transaction struct {
-	FromAddress string
-	ToAddress   string
-	PrivateKey  *ecdsa.PrivateKey
-	PublicKey   *ecdsa.PublicKey
-	Amount      int64
+func (w *Wallet) PrivateKeyStr() string {
+	return fmt.Sprintf("%x", w.PrivateKey.D.Bytes())
 }
 
-func NewTransaction(
-	fromAddress string,
-	toAddress string,
-	privateKey *ecdsa.PrivateKey,
-	publicKey *ecdsa.PublicKey,
-	amount int64,
-) *Transaction {
-	return &Transaction{
-		FromAddress: fromAddress,
-		ToAddress:   toAddress,
-		PrivateKey:  privateKey,
-		PublicKey:   publicKey,
-		Amount:      amount,
-	}
+func (w *Wallet) PublicKeyStr() string {
+	return fmt.Sprintf("%064x%064x", w.PublicKey.X.Bytes(), w.PublicKey.Y.Bytes())
 }
 
-func (t *Transaction) GenerateSignature() *utils.Signature {
-	m, _ := json.Marshal(t)
-
-	log.Println("Generate signature", string(m))
-
-	h := sha256.Sum256(m)
-	r, s, err := ecdsa.Sign(rand.Reader, t.PrivateKey, h[:])
-	if err != nil {
-		// TODO: handle error
-		return nil
-	}
-	return &utils.Signature{R: r, S: s}
-}
-func (t *Transaction) MarshalJSON() ([]byte, error) {
+func (w *Wallet) ToJson() ([]byte, error) {
 	return json.Marshal(struct {
-		FromAddress string `json:"fromAddress"`
-		ToAddress   string `json:"toAddress"`
-		Amount      int64  `json:"amount"`
+		PrivateKey        string `json:"privateKey"`
+		PublicKey         string `json:"publicKey"`
+		BlockchainAddress string `json:"blockchainAddress"`
 	}{
-		FromAddress: t.FromAddress,
-		ToAddress:   t.ToAddress,
-		Amount:      t.Amount,
+		PrivateKey:        w.PrivateKeyStr(),
+		PublicKey:         w.PublicKeyStr(),
+		BlockchainAddress: w.Address,
 	})
+}
+
+func (w *Wallet) MarshalJSON() ([]byte, error) {
+	privateKeyBytes := w.PrivateKey.D.Bytes()
+	publicKeyXBytes := w.PublicKey.X.Bytes()
+	publicKeyYBytes := w.PublicKey.Y.Bytes()
+
+	type Alias Wallet
+	return json.Marshal(&struct {
+		Address    string `json:"address"`
+		PrivateKey []byte `json:"privateKey"`
+		PublicKeyX []byte `json:"publicKeyX"`
+		PublicKeyY []byte `json:"publicKeyY"`
+	}{
+		Address:    w.Address,
+		PrivateKey: privateKeyBytes,
+		PublicKeyX: publicKeyXBytes,
+		PublicKeyY: publicKeyYBytes,
+	})
+}
+
+func (w *Wallet) UnmarshalJSON(data []byte) error {
+	type Alias Wallet
+	aux := &struct {
+		Address    string `json:"address"`
+		PrivateKey []byte `json:"privateKey"`
+		PublicKeyX []byte `json:"publicKeyX"`
+		PublicKeyY []byte `json:"publicKeyY"`
+	}{}
+
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+
+	w.Address = aux.Address
+	w.PrivateKey = new(ecdsa.PrivateKey)
+	w.PrivateKey.PublicKey.Curve = elliptic.P256()
+	w.PrivateKey.D = new(big.Int).SetBytes(aux.PrivateKey)
+
+	w.PublicKey = new(ecdsa.PublicKey)
+	w.PublicKey.Curve = elliptic.P256()
+	w.PublicKey.X = new(big.Int).SetBytes(aux.PublicKeyX)
+	w.PublicKey.Y = new(big.Int).SetBytes(aux.PublicKeyY)
+
+	return nil
 }
