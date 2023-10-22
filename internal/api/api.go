@@ -15,15 +15,16 @@ func NewServer(handlers *Handlers) *Server {
 
 func (h *Server) SetupRoutes() {
 	http.HandleFunc("/", h.handlers.transactionFormHandler)
-	http.HandleFunc("/process-transaction", h.handlers.processTransaction)
-	http.HandleFunc("/mine", h.handlers.mineHandler)
-	http.HandleFunc("/check-tx-status", h.handlers.checkTransactionStatus)
-	http.HandleFunc("/get-wallets", h.handlers.getWallets)
-	http.HandleFunc("/check-bc-validity", h.handlers.checkBlockChainValidity)
+	http.HandleFunc("/process-transaction", disableCors(h.handlers.processTransaction))
+	http.HandleFunc("/mine", disableCors(h.handlers.mineHandler))
+	http.HandleFunc("/check-tx-status", disableCors(h.handlers.checkTransactionStatus))
+	http.HandleFunc("/get-wallets", disableCors(h.handlers.getWallets))
+	http.HandleFunc("/check-bc-validity", disableCors(h.handlers.checkBlockChainValidity))
+	http.HandleFunc("/create-wallet", disableCors(h.handlers.createWallet))
 }
 
 func (h *Server) Run() {
-	log.Printf("server is running on port 8000")
+	log.Printf("server is running on port http://localhost:8000/")
 	err := http.ListenAndServe(":8000", nil)
 	if err != nil {
 		panic(err)
