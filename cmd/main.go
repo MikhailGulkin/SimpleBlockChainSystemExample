@@ -7,11 +7,6 @@ import (
 )
 
 func main() {
-	//wallets := wallet.NewWallets()
-	//bc := blockchain.NewBlockChain(wallets.NewWallet().Address)
-	//wallets.Save()
-	//bc.Save()
-
 	var bc blockchain.BlockChain
 	var wallets wallet.Wallets
 	bc.Load()

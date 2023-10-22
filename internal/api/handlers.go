@@ -3,11 +3,12 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/api/static"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/blockchain"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/wallet"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -23,7 +24,18 @@ func NewHandlers(wallets *wallet.Wallets, bc *blockchain.BlockChain) *Handlers {
 func (h *Handlers) transactionFormHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(static.CreateTxForm)) //nolint:errcheck
+
+		file, err := os.Open("internal/api/static/createTransaction.html")
+		defer file.Close()
+
+		if err != nil {
+			http.Error(w, "Не удалось открыть файл", http.StatusInternalServerError)
+			return
+		}
+		_, err = io.Copy(w, file)
+		if err != nil {
+			http.Error(w, "Не удалось отправить файл", http.StatusInternalServerError)
+		}
 	}
 }
 

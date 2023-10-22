@@ -39,7 +39,7 @@ func (bc *BlockChain) AddTransaction(
 	signature *utils.Signature,
 ) (string, error) {
 	t := NewTransaction(fromAddress, toAddress, transactionType, amount)
-	if fromAddress == MiningSender || fromAddress == bc.BlockChainAddress {
+	if fromAddress == MiningSender {
 		bc.PendingTransactions = append(bc.PendingTransactions, t)
 		return t.Id, nil
 	}
