@@ -161,3 +161,21 @@ func (h *Handlers) checkBlockChainValidity(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
 }
+func (h *Handlers) createWallet(writer http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		writer.Header().Set("Content-Type", "application/json")
+
+		w := wallet.NewWallet()
+		h.blockChain.RegisterNewWallet(w.Address)
+		res := CreateWalletResponse{
+			Address: w.Address,
+		}
+		if err := json.NewEncoder(writer).Encode(res); err != nil {
+			http.Error(writer, "Ошибка при отправке JSON-ответа", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
+
+}

@@ -31,6 +31,9 @@ type (
 	WalletResponse struct {
 		Wallet string `json:"wallet"`
 	}
+	CreateWalletResponse struct {
+		Address string `json:"address"`
+	}
 	BlockChainValidityResponse struct {
 		IsValid bool `json:"isValid"`
 	}

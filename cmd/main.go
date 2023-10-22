@@ -8,8 +8,8 @@ import (
 
 func main() {
 	var bc blockchain.BlockChain
-	bc.Load()
 	var wallets wallet.Wallets
+	bc.Load()
 	wallets.Load()
 
 	handlers := api.NewHandlers(&wallets, &bc)

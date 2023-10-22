@@ -80,6 +80,13 @@ const CreateTxForm = `
             <p id="checkStatusBlockChainField"></p>
         </div>
     </div>
+    <div class="item">
+        <h2>Создать кошелёк</h2>
+        <button id="createWallet">Создать кошелёк</button>
+        <div>
+            <p id="createWalletField"></p>
+        </div>
+    </div>
 
 </div>
 
@@ -90,6 +97,7 @@ const CreateTxForm = `
     const mineResultField = document.getElementById('mineResultField');
     const wallets = document.getElementById('wallets');
     const blockChain = document.getElementById('checkStatusBlockChainField');
+    const createWalletField = document.getElementById('createWalletField');
 
     function sendTransaction(event) {
         event.preventDefault();
@@ -98,8 +106,6 @@ const CreateTxForm = `
         const form = document.getElementById('transactionForm');
 
         const formData = new FormData(form);
-        // form.reset();
-
 
         fetch('http://localhost:8000/process-transaction', {
             headers: {
@@ -202,6 +208,27 @@ const CreateTxForm = `
 
     }
 
+    function createWallet(event) {
+        event.preventDefault();
+        createWalletField.innerHTML = '';
+
+        fetch('http://localhost:8000/create-wallet', {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+        })
+            .then(response => response.json())
+            .then(data => {
+                createWalletField.innerHTML = JSON.stringify(data, null, 4);
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error);
+            });
+
+    }
+
     const transactionForm = document.getElementById('transactionForm');
     transactionForm.addEventListener('submit', sendTransaction);
 
@@ -216,6 +243,9 @@ const CreateTxForm = `
 
     const checkBCButton = document.getElementById('checkBC');
     checkBCButton.addEventListener('click', checkBC);
+
+    const createWalletButton = document.getElementById('createWallet');
+    createWalletButton.addEventListener('click', createWallet);
 </script>
 </body>
 </html>

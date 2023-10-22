@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type Wallets struct {
@@ -38,10 +41,18 @@ func (w *Wallets) Save() {
 	if err != nil {
 		log.Println("error: ", err)
 	}
+
 }
 func (w *Wallets) Load() {
 	err := utils.Load(&w, "wallet")
 	if err != nil {
 		log.Println("error: ", err)
 	}
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		w.Save()
+		os.Exit(1)
+	}()
 }
