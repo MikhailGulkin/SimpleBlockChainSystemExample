@@ -27,6 +27,21 @@ func (bc *BlockChain) Mining(address string) error {
 	bc.CreateBlock(nonce, prevHash)
 	return nil
 }
+func (bc *BlockChain) genMining(address string) error {
+	if len(bc.PendingTransactions) == 0 {
+		return errors.New("no transactions")
+	}
+	if address == "" {
+		return errors.New("address is empty")
+	}
+	if _, ok := bc.GetWallets()[address]; !ok && address != bc.BlockChainAddress {
+		return errors.New("invalid address")
+	}
+	nonce := bc.ProofOfWork()
+	prevHash := bc.LastBlock().Hash()
+	bc.CreateBlock(nonce, prevHash)
+	return nil
+}
 
 func (bc *BlockChain) ProofOfWork() int64 {
 	txs := bc.CopyTransactionPool()

@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	MiningDifficulty = 3
+	MiningDifficulty = 2
 	MiningSender     = "THE BLOCKCHAIN"
 	MiningReward     = 1.0
 )

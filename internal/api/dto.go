@@ -42,4 +42,7 @@ type (
 	BlockChainValidityResponse struct {
 		IsValid bool `json:"isValid"`
 	}
+	TransactionGenBlocksResponse struct {
+		TransactionType string `json:"transactionType"`
+	}
 )

@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/wallet"
 	"testing"
 )
@@ -14,7 +13,7 @@ func TestBlockChain_AddTransaction(t *testing.T) {
 		MiningSender,
 		w.Address,
 		10,
-		utils.UserTransaction,
+		wallet.GetTransactionType(10),
 		nil,
 		nil,
 	)
@@ -28,7 +27,7 @@ func TestBlockChain_AddTransaction(t *testing.T) {
 	tx := wallet.NewTransaction(
 		MiningSender,
 		w.Address,
-		utils.UserTransaction,
+		wallet.GetTransactionType(10),
 		w.PrivateKey,
 		w.PublicKey,
 		10,
@@ -38,7 +37,7 @@ func TestBlockChain_AddTransaction(t *testing.T) {
 		MiningSender,
 		"toAddress",
 		10,
-		utils.UserTransaction,
+		wallet.GetTransactionType(10),
 		w.PublicKey,
 		sig,
 	)
@@ -58,4 +57,29 @@ func TestBlockChain_AddTransaction(t *testing.T) {
 			t.Fatalf("expected 10, got: %v", balance)
 		}
 	})
+}
+
+func TestBlockChain_GenerateBlocks(t *testing.T) {
+	w := wallet.NewWallet()
+	bc := NewBlockChain(w.Address)
+	bc.RegisterNewWallet(wallet.NewWallet().Address)
+	bc.RegisterNewWallet(wallet.NewWallet().Address)
+	bc.RegisterNewWallet(wallet.NewWallet().Address)
+	bc.RegisterNewWallet(wallet.NewWallet().Address)
+
+	prevLen := len(bc.Chain)
+	blockGenCount := 10
+	blocks := bc.GenerateBlocks(blockGenCount)
+
+	if len(blocks) != blockGenCount {
+		t.Fatalf("!=")
+	}
+	if len(bc.Chain) != blockGenCount+1+prevLen {
+		t.Fatalf("")
+	}
+	for _, block := range blocks {
+		if len(block.Transactions) != TxNumInBlocks {
+			t.Fatalf("")
+		}
+	}
 }

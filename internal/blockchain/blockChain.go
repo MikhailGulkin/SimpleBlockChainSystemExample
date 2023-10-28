@@ -141,6 +141,8 @@ func (bc *BlockChain) Load() {
 	if err != nil {
 		log.Printf("error while loading block chain: %s", err.Error())
 	}
+}
+func (bc *BlockChain) SignalSave() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {

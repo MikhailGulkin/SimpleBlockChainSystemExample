@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/blockchain"
-	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/utils"
 	"github.com/MikhailGulkin/SimpleBlockChainSystemExample/internal/wallet"
 	"io"
 	"net/http"
@@ -63,7 +62,7 @@ func (h *Handlers) processTransaction(w http.ResponseWriter, r *http.Request) {
 		tx := wallet.NewTransaction(
 			user1.Address,
 			user2.Address,
-			utils.UserTransaction,
+			wallet.GetTransactionType(int64(amount)),
 			user1.PrivateKey,
 			user1.PublicKey,
 			int64(amount),
@@ -189,7 +188,6 @@ func (h *Handlers) createWallet(writer http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
-
 }
 func (h *Handlers) getWalletTransactions(writer http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
@@ -216,5 +214,26 @@ func (h *Handlers) getWalletTransactions(writer http.ResponseWriter, r *http.Req
 	} else {
 		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
+}
 
+func (h *Handlers) getGenBlocks(writer http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		blocks := h.blockChain.GenerateBlocks(10)
+		res := make([][]TransactionGenBlocksResponse, 10)
+		for index, block := range blocks {
+			var txs []TransactionGenBlocksResponse
+			for _, tx := range block.Transactions {
+				txs = append(txs, TransactionGenBlocksResponse{
+					string(tx.TransactionType),
+				})
+			}
+			res[index] = txs
+		}
+		if err := json.NewEncoder(writer).Encode(res); err != nil {
+			http.Error(writer, "Ошибка при отправке JSON-ответа", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
 }

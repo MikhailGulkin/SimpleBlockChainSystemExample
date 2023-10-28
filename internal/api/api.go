@@ -22,6 +22,7 @@ func (h *Server) SetupRoutes() {
 	http.HandleFunc("/check-bc-validity", disableCors(h.handlers.checkBlockChainValidity))
 	http.HandleFunc("/create-wallet", disableCors(h.handlers.createWallet))
 	http.HandleFunc("/get-wallet-transactions", disableCors(h.handlers.getWalletTransactions))
+	http.HandleFunc("/get-blocks", disableCors(h.handlers.getGenBlocks))
 }
 
 func (h *Server) Run() {
