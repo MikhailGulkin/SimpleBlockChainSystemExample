@@ -36,6 +36,12 @@ func (bc *BlockChain) CreateBlock(once int64, prevHash [32]byte) *Block {
 func (bc *BlockChain) LastBlock() *Block {
 	return bc.Chain[len(bc.Chain)-1]
 }
+func (bc *BlockChain) GetNBlocks(n int) []*Block {
+	if n > len(bc.Chain) {
+		return bc.Chain
+	}
+	return bc.Chain[len(bc.Chain)-n:]
+}
 func (bc *BlockChain) GetFixedBalance(address string) (int64, error) {
 	var balance int64
 	addressFound := false

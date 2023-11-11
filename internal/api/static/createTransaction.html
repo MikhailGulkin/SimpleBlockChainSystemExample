@@ -97,6 +97,36 @@
         <div id="walletTransactionsContainer">
         </div>
     </div>
+
+    <div class="item">
+        <h2>Сгенерировать блоки</h2>
+        <form id="generateTransactionsForm">
+            <label for="generateTransactions">Количество блоков:</label>
+            <input type="number" id="generateTransactions" name="amount" required><br><br>
+            <input type="submit" value="Сгенерировать">
+        </form>
+        <div>
+            <p id="generateTransactionsField"></p>
+        </div>
+    </div>
+    <div class="item">
+        <h2>Получить предсказание для следующего блока на основе предыдущих блоков</h2>
+        <form id="predictForm">
+            <label for="predict">Количество блоков:</label>
+            <input type="number" id="predict" name="amount" required><br><br>
+            <input type="submit" value="Получить предсказание">
+        </form>
+        <div>
+            <p id="predictField"></p>
+        </div>
+    </div>
+    <div class="item">
+        <h2>Узнать количество блоков</h2>
+        <button id="getBlocks">Получить</button>
+        <div>
+            <p id="getBlocksField"></p>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -107,6 +137,10 @@
     const blockChain = document.getElementById('checkStatusBlockChainField');
     const createWalletField = document.getElementById('createWalletField');
     const getWalletTransactionsContainer = document.getElementById('walletTransactionsContainer');
+    const generateTransactionsContainer = document.getElementById('generateTransactionsField');
+    const predictField = document.getElementById('predictField');
+    const getBlocksField = document.getElementById('getBlocksField');
+
 
     function sendTransaction(event) {
         event.preventDefault();
@@ -274,6 +308,74 @@
             });
     }
 
+    function generateTransactions(event) {
+        event.preventDefault()
+        generateTransactionsContainer.innerHTML = '';
+        const form = document.getElementById('generateTransactionsForm');
+
+        const formData = new FormData(form);
+        form.reset();
+
+        fetch(`http://localhost:8000/generate-blocks?count=${formData.get("amount")}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                generateTransactionsContainer.innerHTML = JSON.stringify(data, null, 4);
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error);
+            });
+    }
+
+    function getPrediction(event) {
+        event.preventDefault()
+        predictField.innerHTML = '';
+
+        const form = document.getElementById('predictForm');
+
+        const formData = new FormData(form);
+        form.reset();
+
+        fetch(`http://localhost:8001/predict?amount=${formData.get("amount")}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                predictField.innerHTML = JSON.stringify(data, null, 4);
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error);
+            });
+    }
+
+    function getBlocks(event) {
+        event.preventDefault()
+        getBlocksField.innerHTML = '';
+
+        fetch(`http://localhost:8000/get-block-сhain-length`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+        })
+            .then(response => response.json())
+            .then(data => {
+                getBlocksField.innerHTML = JSON.stringify(data, null, 4);
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error);
+            });
+    }
     const transactionForm = document.getElementById('transactionForm');
     transactionForm.addEventListener('submit', sendTransaction);
 
@@ -294,6 +396,15 @@
 
     const getWalletTransactionsButton = document.getElementById('walletTransactionsForm');
     getWalletTransactionsButton.addEventListener('submit', getWalletTransactions);
+
+    const generateTransactionsButton = document.getElementById('generateTransactionsForm');
+    generateTransactionsButton.addEventListener('submit', generateTransactions);
+
+    const predictButton = document.getElementById('predictForm');
+    predictButton.addEventListener('submit', getPrediction);
+
+    const getBlocksButton = document.getElementById('getBlocks');
+    getBlocksButton.addEventListener('click', getBlocks);
 </script>
 </body>
 </html>

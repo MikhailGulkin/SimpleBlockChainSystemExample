@@ -215,11 +215,20 @@ func (h *Handlers) getWalletTransactions(writer http.ResponseWriter, r *http.Req
 		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
 }
-
-func (h *Handlers) getGenBlocks(writer http.ResponseWriter, r *http.Request) {
+func (h *Handlers) getBlocks(writer http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		blocks := h.blockChain.GenerateBlocks(10)
-		res := make([][]TransactionGenBlocksResponse, 10)
+		count := r.URL.Query().Get("count")
+		if count == "" {
+			http.Error(writer, "Не указано количество блоков", http.StatusBadRequest)
+			return
+		}
+		countI, err := strconv.Atoi(count)
+		if err != nil {
+			http.Error(writer, "Неправильное преобразование", http.StatusBadRequest)
+			return
+		}
+		blocks := h.blockChain.GetNBlocks(countI)
+		res := make([][]TransactionGenBlocksResponse, countI)
 		for index, block := range blocks {
 			var txs []TransactionGenBlocksResponse
 			for _, tx := range block.Transactions {
@@ -236,4 +245,36 @@ func (h *Handlers) getGenBlocks(writer http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
 	}
+}
+func (h *Handlers) genBlocks(writer http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		count := r.URL.Query().Get("count")
+		if count == "" {
+			http.Error(writer, "Не указано количество блоков", http.StatusBadRequest)
+			return
+		}
+		countI, err := strconv.Atoi(count)
+		if err != nil {
+			http.Error(writer, "Неправильное преобразование", http.StatusBadRequest)
+			return
+		}
+		h.blockChain.GenerateBlocks(countI)
+		if err := json.NewEncoder(writer).Encode(map[string]string{"Block": "Gen Success"}); err != nil {
+			http.Error(writer, "Ошибка при отправке JSON-ответа", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
+}
+func (h *Handlers) getBlockChainLength(writer http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		if err := json.NewEncoder(writer).Encode(map[string]int{"Length": len(h.blockChain.GetChain())}); err != nil {
+			http.Error(writer, "Ошибка при отправке JSON-ответа", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		http.Error(writer, "Метод не поддерживается", http.StatusMethodNotAllowed)
+	}
+
 }

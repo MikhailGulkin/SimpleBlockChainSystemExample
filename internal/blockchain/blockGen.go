@@ -8,7 +8,7 @@ import (
 	"math/rand"
 )
 
-const TxNumInBlocks = 100
+const TxNumInBlocks = 1000
 
 // GenerateBlocks For generate test data only
 func (bc *BlockChain) GenerateBlocks(count int) []*Block {
