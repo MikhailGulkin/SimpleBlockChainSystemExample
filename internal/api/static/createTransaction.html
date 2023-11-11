@@ -5,14 +5,99 @@
     <title>Форма для перевода</title>
 </head>
 <style>
-    .container {
-        display: flex;
-        flex-direction: column;
-        text-align: center;
-        padding-left: 100px;
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        line-height: 1.6;
+        padding: 0 20px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
-    .item {
+    .container {
+        max-width: 700px;
+        margin: 20px auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    h2 {
+        color: #444;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    button,
+    input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    }
+
+    button,
+    input[type="submit"] {
+        background-color: #285ba7;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    button:hover,
+    input[type="submit"]:hover {
+       opacity: 0.8;
+       transition: ease-out 0.1s;
+    }
+
+    button:active,
+    input[type="submit"]:active {
+        opacity: 0.8;
+        transition: ease-out 0.1s;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    ul li {
+        background-color: #eee;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    ul li:hover {
+        background-color: #ddd;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
     }
 
 </style>
