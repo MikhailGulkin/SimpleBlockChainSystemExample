@@ -13,15 +13,19 @@
         padding: 0 20px;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+
     }
 
     .container {
-        max-width: 700px;
+        max-width: 1280px;
         margin: 20px auto;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         padding: 20px;
-        background: white;
+
         border-radius: 8px;
+    }
+    .words-wrap {
+        word-wrap: break-word;
     }
 
     h2 {
@@ -34,7 +38,11 @@
         display: block;
         margin-bottom: 5px;
         font-weight: bold;
+        text-align: start;
     }
+
+
+
 
     input[type="text"],
     input[type="number"],
@@ -65,8 +73,8 @@
 
     button:hover,
     input[type="submit"]:hover {
-       opacity: 0.8;
-       transition: ease-out 0.1s;
+        opacity: 0.8;
+        transition: ease-out 0.1s;
     }
 
     button:active,
@@ -92,6 +100,26 @@
         background-color: #ddd;
     }
 
+    .content{
+        display: flex;
+        justify-content: center;
+        flex-flow: wrap;
+        gap: 60px;
+    }
+
+    .item{
+        display: block;
+        border: 4px solid black;
+        padding: 20px;
+        border-radius:20px;
+        min-height: 500px;
+        max-width: 300px;
+        width: 300px;
+        height: 100%;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
     @media (max-width: 600px) {
         .container {
             width: 100%;
@@ -103,116 +131,121 @@
 </style>
 <body>
 <div class="container">
-    <div class="item">
-        <h2>Перевод транзакции</h2>
-        <form id="transactionForm">
-            <label for="sender">От кого:</label>
-            <input type="text" id="sender" name="sender" required><br><br>
+    <div class="content">
+        <div class="item">
+            <h2>Перевод транзакции</h2>
+            <form id="transactionForm">
+                <label for="sender">От кого:</label>
+                <input type="text" id="sender" name="sender" required><br><br>
 
-            <label for="receiver">Кому:</label>
-            <input type="text" id="receiver" name="receiver" required><br><br>
+                <label for="receiver">Кому:</label>
+                <input type="text" id="receiver" name="receiver" required><br><br>
 
-            <label for="amount">Сколько:</label>
-            <input type="number" id="amount" name="amount" required><br><br>
+                <label for="amount">Сколько:</label>
+                <input type="number" id="amount" name="amount" required><br><br>
 
-            <input type="submit" value="Перевести">
-        </form>
-        <div>
-            <p id="transactionResultField"></p>
+                <input type="submit" value="Перевести">
+            </form>
+            <div>
+                <p id="transactionResultField"></p>
+            </div>
+
         </div>
-    </div>
+        <div class="item">
+            <h2>Узнать статус транзакции</h2>
+            <form id="checkStatusTransactionForm">
+                <label for="checkTxStatus">Айди транзакции:</label>
+                <input type="text" id="checkTxStatus" name="transactionId" required><br><br>
 
-    <div class="item">
-        <h2>Узнать статус транзакции</h2>
-        <form id="checkStatusTransactionForm">
-            <label for="checkTxStatus">Айди транзакции:</label>
-            <input type="text" id="checkTxStatus" name="transactionId" required><br><br>
-
-            <input type="submit" value="Узнать статус">
-        </form>
-        <div>
-            <p id="checkStatusTransactionResultField"></p>
+                <input type="submit" value="Узнать статус">
+            </form>
+            <div>
+                <p id="checkStatusTransactionResultField"></p>
+            </div>
         </div>
-    </div>
 
-    <div class="item">
-        <h2>Обработать все транзакции и создать блок(Майнить)</h2>
-        <form id="mineForm">
-            <label for="mine">Адресс майнера:</label>
-            <input type="text" id="mine" name="address" required><br><br>
+        <div class="item">
+            <h2>Обработать все транзакции и создать блок(Майнить)</h2>
+            <form id="mineForm">
+                <label for="mine">Адресс майнера:</label>
+                <input type="text" id="mine" name="address" required><br><br>
 
-            <input type="submit" value="Майнить">
-        </form>
-        <div>
-            <p id="mineResultField"></p>
+                <input type="submit" value="Майнить">
+            </form>
+            <div>
+                <p id="mineResultField"></p>
+            </div>
         </div>
-    </div>
-    <div class="item">
-        <h2>Получить все кошельки</h2>
-        <button id="getWallets">Получить</button>
-        <div>
-            <ul id="wallets"></ul>
+        <div class="item">
+            <h2>Получить все кошельки</h2>
+            <button id="getWallets">Получить</button>
+            <div class="words-wrap">
+                <p id="wallets"></p>
+            </div>
         </div>
-    </div>
 
-    <div class="item">
-        <h2>Пороверить валидность блокчейна</h2>
-        <button id="checkBC">Проверить</button>
-        <div>
-            <p id="checkStatusBlockChainField"></p>
+        <div class="item">
+            <h2>Пороверить валидность блокчейна</h2>
+            <button id="checkBC">Проверить</button>
+            <div>
+                <p id="checkStatusBlockChainField"></p>
+            </div>
         </div>
-    </div>
 
-    <div class="item">
-        <h2>Создать кошелёк</h2>
-        <button id="createWallet">Создать кошелёк</button>
-        <div>
-            <p id="createWalletField"></p>
+        <div class="item">
+            <h2>Создать кошелёк</h2>
+            <button id="createWallet">Создать кошелёк</button>
+            <div>
+                <p id="createWalletField"></p>
+            </div>
         </div>
-    </div>
 
-    <div class="item">
-        <h2>Получить транзакции пользователя</h2>
-        <form id="walletTransactionsForm">
-            <label for="transaction">Адресс кошелька:</label>
-            <input type="text" id="transaction" name="address" required><br><br>
+        <div class="item">
+            <h2>Получить транзакции пользователя</h2>
+            <form id="walletTransactionsForm">
+                <label for="transaction">Адресс кошелька:</label>
+                <input type="text" id="transaction" name="address" required><br><br>
 
-            <input type="submit" value="Получить транзакции">
-        </form>
-        <div id="walletTransactionsContainer">
+                <input type="submit" value="Получить транзакции">
+            </form>
+            <div id="walletTransactionsContainer">
+            </div>
         </div>
-    </div>
 
-    <div class="item">
-        <h2>Сгенерировать блоки</h2>
-        <form id="generateTransactionsForm">
-            <label for="generateTransactions">Количество блоков:</label>
-            <input type="number" id="generateTransactions" name="amount" required><br><br>
-            <input type="submit" value="Сгенерировать">
-        </form>
-        <div>
-            <p id="generateTransactionsField"></p>
+        <div class="item">
+            <h2>Сгенерировать блоки</h2>
+            <form id="generateTransactionsForm">
+                <label for="generateTransactions">Количество блоков:</label>
+                <input type="number" id="generateTransactions" name="amount" required><br><br>
+                <input type="submit" value="Сгенерировать">
+            </form>
+            <div>
+                <p id="generateTransactionsField"></p>
+            </div>
         </div>
-    </div>
-    <div class="item">
-        <h2>Получить предсказание для следующего блока на основе предыдущих блоков</h2>
-        <form id="predictForm">
-            <label for="predict">Количество блоков:</label>
-            <input type="number" id="predict" name="amount" required><br><br>
-            <input type="submit" value="Получить предсказание">
-        </form>
-        <div>
-            <p id="predictField"></p>
+        <div class="item">
+            <h2>Получить предсказание для следующего блока на основе предыдущих блоков</h2>
+            <form id="predictForm">
+                <label for="predict">Количество блоков:</label>
+                <input type="number" id="predict" name="amount" required><br><br>
+                <input type="submit" value="Получить предсказание">
+            </form>
+            <div>
+                <p id="predictField"></p>
+            </div>
         </div>
-    </div>
-    <div class="item">
-        <h2>Узнать количество блоков</h2>
-        <button id="getBlocks">Получить</button>
-        <div>
-            <p id="getBlocksField"></p>
+        <div class="item">
+            <h2>Узнать количество блоков</h2>
+            <button id="getBlocks">Получить</button>
+            <div>
+                <p id="getBlocksField"></p>
+            </div>
         </div>
     </div>
 </div>
+
+
+
 
 <script>
     const transactionResultField = document.getElementById('transactionResultField');
